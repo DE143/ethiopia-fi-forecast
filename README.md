@@ -31,12 +31,11 @@ ethiopia-fi-forecast/
 ## Installation
 
 1. Clone the repository:
-``` git clone https://github.com/yourusername/ethiopia-fi-forecast.git
-cd ethiopia-fi-forecast ```
+```git clone https://github.com/yourusername/ethiopia-fi-forecast.git cd ethiopia-fi-forecast ```
 2.  Create a virtual environment (optional but recommended):
-```python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate```
-3. Install dependencies:
+```python -m venv venv```
+```source venv/bin/activate  # On Windows: venv\Scripts\activate```
+4. Install dependencies:
 ```pip install -r requirements.txt```
 ## Running the Project
 Task 1: Data Exploration and Enrichment
