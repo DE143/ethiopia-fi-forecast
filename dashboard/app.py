@@ -760,7 +760,7 @@ class FinancialInclusionDashboard:
         - **Infrastructure Improvements:** 4G coverage growth (15% → 70%) and agent network expansion
         - **Policy Enablers:** Digital ID rollout, interoperability platform, regulatory reforms
         - **Market Competition:** Entry of M-Pesa increased competition and innovation
-        
+
         **Secondary Drivers:**
         - Urbanization and demographic changes
         - Smartphone penetration growth (20% → 50%)
@@ -774,14 +774,14 @@ class FinancialInclusionDashboard:
 
         events_impact = """
         **Major Event Impacts (Estimated):**
-        
+
         | Event | Impact on Accounts | Impact on Usage | Lag |
         |-------|-------------------|-----------------|-----|
         | Telebirr Launch (2021) | +8-10 pp | +10-12 pp | 6-12 months |
         | M-Pesa Entry (2023) | +3-5 pp | +4-6 pp | 3-6 months |
         | Interoperability (2022) | +1-2 pp | +2-3 pp | 6-12 months |
         | Digital ID Rollout (2023) | +2-4 pp | +1-2 pp | 12-18 months |
-        
+
         **Key Patterns:**
         - Product launches have immediate impacts (3-6 month lag)
         - Infrastructure investments have longer lags (12-24 months)
@@ -796,19 +796,19 @@ class FinancialInclusionDashboard:
 
         projections = """
         **Base Scenario Projections:**
-        
+
         | Indicator | 2024 | 2025 | 2026 | 2027 | Target 2027 |
         |-----------|------|------|------|------|-------------|
         | Account Ownership | 49% | 51-52% | 53-54% | 54-56% | 60% |
         | Digital Payments | ~35% | 38-40% | 41-43% | 42-45% | 50% |
         | Mobile Money Accounts | 9.45% | 12-14% | 15-18% | 18-22% | 25% |
-        
+
         **Key Trends:**
         - Continued growth but at slower pace than 2017-2021 period
         - Mobile money remains primary driver
         - Usage growing faster than access (narrowing registered-active gap)
         - Urban-rural and gender gaps persist but may narrow slightly
-        
+
         **Target Achievement:**
         - NFIS-II 60% account ownership target requires additional interventions
         - Digital payment target (50%) more achievable with current trajectory
@@ -825,17 +825,17 @@ class FinancialInclusionDashboard:
            - Target agent network expansion in underserved regions
            - Develop agriculture-focused digital payment products
            - Partner with cooperatives and farmer organizations
-        
+
         2. **Address Gender Gap**
            - Design women-focused financial products
            - Promote female agent networks
            - Address structural barriers to women's financial access
-        
+
         3. **Boost Usage, Not Just Access**
            - Develop compelling use cases (wages, bills, commerce)
            - Promote merchant acceptance (QR codes, POS terminals)
            - Simplify user interfaces and reduce transaction costs
-        
+
         4. **Strengthen Monitoring**
            - Establish more frequent inclusion measurement
            - Develop real-time dashboards for policymakers
@@ -869,15 +869,15 @@ class FinancialInclusionDashboard:
         st.sidebar.info(
             """
         This dashboard provides forecasts and analysis of Ethiopia's financial inclusion progress.
-        
+
         **Data Sources:**
         - Global Findex Database
         - NBE Reports
         - GSMA Intelligence
         - Operator Reports
-        
+
         **Last Updated:** January 2026
-        
+
         **For:** National Bank of Ethiopia, Development Partners, Mobile Money Operators
         """
         )

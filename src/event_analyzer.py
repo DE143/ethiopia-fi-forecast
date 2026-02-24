@@ -362,8 +362,10 @@ class EventImpactModeler:
 
         return {
             "impact_matrix": f"{output_dir}/impact_matrix.png",
-            "model_validation": f"{output_dir}/model_validation.png"
-            if not validation_df.empty
-            else None,
+            "model_validation": (
+                f"{output_dir}/model_validation.png"
+                if not validation_df.empty
+                else None
+            ),
             "impact_timeline": f"{output_dir}/impact_timeline.png",
         }

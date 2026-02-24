@@ -374,9 +374,9 @@ class FinancialInclusionForecaster:
 
             plt.tight_layout()
             plt.savefig(f"{output_dir}/account_ownership_forecast.png", dpi=300)
-            viz_files[
-                "account_forecast"
-            ] = f"{output_dir}/account_ownership_forecast.png"
+            viz_files["account_forecast"] = (
+                f"{output_dir}/account_ownership_forecast.png"
+            )
 
         # 2. All Indicators Forecast Comparison
         fig, axes = plt.subplots(1, 3, figsize=(18, 6))

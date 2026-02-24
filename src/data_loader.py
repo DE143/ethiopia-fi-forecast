@@ -171,15 +171,19 @@ class DataLoader:
             "total_records": len(self.raw_data),
             "record_type_counts": self.raw_data["record_type"].value_counts().to_dict(),
             "pillar_counts": self.raw_data["pillar"].value_counts().to_dict(),
-            "temporal_range": {
-                "start": self.raw_data["observation_date"].min(),
-                "end": self.raw_data["observation_date"].max(),
-            }
-            if "observation_date" in self.raw_data.columns
-            else None,
-            "unique_indicators": self.raw_data["indicator"].nunique()
-            if "indicator" in self.raw_data.columns
-            else 0,
+            "temporal_range": (
+                {
+                    "start": self.raw_data["observation_date"].min(),
+                    "end": self.raw_data["observation_date"].max(),
+                }
+                if "observation_date" in self.raw_data.columns
+                else None
+            ),
+            "unique_indicators": (
+                self.raw_data["indicator"].nunique()
+                if "indicator" in self.raw_data.columns
+                else 0
+            ),
         }
 
         return summary

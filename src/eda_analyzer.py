@@ -42,19 +42,20 @@ class EDAAnalyzer:
         )
 
         insights = {
-            "current_rate": access_data["value_numeric"].iloc[-1]
-            if len(access_data) > 0
-            else None,
-            "latest_growth": access_data["growth_pp"].iloc[-1]
-            if len(access_data) > 1
-            else None,
-            "avg_annual_growth": access_data["annual_growth"].mean()
-            if len(access_data) > 1
-            else None,
-            "slowdown_2024": access_data["growth_pp"].iloc[-1]
-            < access_data["growth_pp"].iloc[-2]
-            if len(access_data) > 2
-            else None,
+            "current_rate": (
+                access_data["value_numeric"].iloc[-1] if len(access_data) > 0 else None
+            ),
+            "latest_growth": (
+                access_data["growth_pp"].iloc[-1] if len(access_data) > 1 else None
+            ),
+            "avg_annual_growth": (
+                access_data["annual_growth"].mean() if len(access_data) > 1 else None
+            ),
+            "slowdown_2024": (
+                access_data["growth_pp"].iloc[-1] < access_data["growth_pp"].iloc[-2]
+                if len(access_data) > 2
+                else None
+            ),
             "trajectory": access_data[["observation_date", "value_numeric"]].to_dict(
                 "records"
             ),
@@ -89,14 +90,19 @@ class EDAAnalyzer:
             )  # 50% activity rate
 
         insights = {
-            "mobile_money_growth": mm_data["value_numeric"].pct_change().mean() * 100
-            if len(mm_data) > 1
-            else None,
+            "mobile_money_growth": (
+                mm_data["value_numeric"].pct_change().mean() * 100
+                if len(mm_data) > 1
+                else None
+            ),
             "registered_active_gap": (
-                mm_data["value_numeric"].iloc[-1] - mm_data["active_estimate"].iloc[-1]
-            )
-            if len(mm_data) > 0
-            else None,
+                (
+                    mm_data["value_numeric"].iloc[-1]
+                    - mm_data["active_estimate"].iloc[-1]
+                )
+                if len(mm_data) > 0
+                else None
+            ),
             "payment_trend": payment_data.groupby("indicator_code")["value_numeric"]
             .last()
             .to_dict(),
@@ -134,22 +140,26 @@ class EDAAnalyzer:
 
         insights = {
             "infrastructure_levels": correlations,
-            "agent_density_trend": infra_data[
-                infra_data["indicator_code"] == "AGENT_DENSITY"
-            ]["value_numeric"]
-            .pct_change()
-            .mean()
-            * 100
-            if len(infra_data[infra_data["indicator_code"] == "AGENT_DENSITY"]) > 1
-            else None,
-            "coverage_growth": infra_data[
-                infra_data["indicator_code"] == "4G_COVERAGE"
-            ]["value_numeric"]
-            .pct_change()
-            .mean()
-            * 100
-            if len(infra_data[infra_data["indicator_code"] == "4G_COVERAGE"]) > 1
-            else None,
+            "agent_density_trend": (
+                infra_data[infra_data["indicator_code"] == "AGENT_DENSITY"][
+                    "value_numeric"
+                ]
+                .pct_change()
+                .mean()
+                * 100
+                if len(infra_data[infra_data["indicator_code"] == "AGENT_DENSITY"]) > 1
+                else None
+            ),
+            "coverage_growth": (
+                infra_data[infra_data["indicator_code"] == "4G_COVERAGE"][
+                    "value_numeric"
+                ]
+                .pct_change()
+                .mean()
+                * 100
+                if len(infra_data[infra_data["indicator_code"] == "4G_COVERAGE"]) > 1
+                else None
+            ),
         }
 
         return infra_data, insights
@@ -199,9 +209,9 @@ class EDAAnalyzer:
 
         insights = {
             "current_gap": gender_data["gender_gap"].iloc[-1],
-            "gap_trend": "stable"
-            if gender_data["gender_gap"].std() < 2
-            else "changing",
+            "gap_trend": (
+                "stable" if gender_data["gender_gap"].std() < 2 else "changing"
+            ),
             "female_growth": gender_data["female_ownership"].pct_change().mean() * 100,
             "closing_rate": (
                 gender_data["gender_gap"].iloc[-1] - gender_data["gender_gap"].iloc[0]
@@ -227,9 +237,11 @@ class EDAAnalyzer:
             "current_gap": urban_rural_data["urban_rural_gap"].iloc[-1],
             "rural_growth": urban_rural_data["rural_ownership"].pct_change().mean()
             * 100,
-            "gap_trend": "narrowing"
-            if urban_rural_data["urban_rural_gap"].diff().iloc[-1] < 0
-            else "widening",
+            "gap_trend": (
+                "narrowing"
+                if urban_rural_data["urban_rural_gap"].diff().iloc[-1] < 0
+                else "widening"
+            ),
         }
 
         return urban_rural_data, insights
@@ -410,9 +422,9 @@ class EDAAnalyzer:
         return {
             "access_trend": f"{output_dir}/access_trend.png",
             "growth_comparison": f"{output_dir}/growth_comparison.png",
-            "mobile_money_growth": f"{output_dir}/mobile_money_growth.png"
-            if len(mm_data) > 0
-            else None,
+            "mobile_money_growth": (
+                f"{output_dir}/mobile_money_growth.png" if len(mm_data) > 0 else None
+            ),
             "event_timeline": f"{output_dir}/event_timeline.png",
             "gender_gap": f"{output_dir}/gender_gap.png",
         }

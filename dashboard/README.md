@@ -159,31 +159,31 @@ from data_loader import DataLoader
 class TestDataLoader(unittest.TestCase):
     def setUp(self):
         self.loader = DataLoader()
-        
+
     def test_load_data(self):
         """Test data loading functionality"""
         data, ref_codes = self.loader.load_data()
-        
+
         self.assertIsNotNone(data)
         self.assertIsNotNone(ref_codes)
-        
+
         # Check required columns exist
         required_cols = ['record_type', 'pillar', 'indicator']
         for col in required_cols:
             self.assertIn(col, data.columns)
-            
+
     def test_validate_data(self):
         """Test data validation"""
         data, ref_codes = self.loader.load_data()
         is_valid = self.loader.validate_data()
-        
+
         self.assertIsInstance(is_valid, bool)
-        
+
     def test_get_data_summary(self):
         """Test summary generation"""
         data, ref_codes = self.loader.load_data()
         summary = self.loader.get_data_summary()
-        
+
         self.assertIsInstance(summary, dict)
         self.assertIn('total_records', summary)
         self.assertIn('record_type_counts', summary)
@@ -191,4 +191,3 @@ class TestDataLoader(unittest.TestCase):
 if __name__ == '__main__':
     unittest.main()
     ```
-    
