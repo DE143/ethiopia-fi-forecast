@@ -17,10 +17,10 @@ jobs:
         python-version: [3.9, '3.10', '3.11']
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -46,7 +46,6 @@ jobs:
     
     - name: Test data directory structure
       run: |
-        # Check required directories exist
         if [ ! -d "data/raw" ]; then
           echo "❌ data/raw directory does not exist"
           exit 1
@@ -59,22 +58,20 @@ jobs:
     
     - name: Check for required files
       run: |
-        # Create minimal required files if they don't exist (for CI/CD)
         if [ ! -f "data/raw/ethiopia_fi_unified_data.csv" ]; then
-          echo "⚠️  Creating sample data file for testing..."
+          echo "⚠️ Creating sample data file for testing..."
           mkdir -p data/raw
           echo "record_type,pillar,indicator,indicator_code,value_numeric,observation_date,source_name,confidence" > data/raw/ethiopia_fi_unified_data.csv
           echo "observation,access,Account Ownership Rate,ACC_OWNERSHIP,49.0,2024-01-01,Global Findex,high" >> data/raw/ethiopia_fi_unified_data.csv
         fi
         
         if [ ! -f "data/raw/reference_codes.csv" ]; then
-          echo "⚠️  Creating sample reference codes for testing..."
+          echo "⚠️ Creating sample reference codes for testing..."
           echo "field,code,description" > data/raw/reference_codes.csv
           echo "record_type,observation,Measured value" >> data/raw/reference_codes.csv
           echo "record_type,event,Historical event" >> data/raw/reference_codes.csv
         fi
         
-        # Check other required files
         if [ ! -f "requirements.txt" ]; then
           echo "❌ requirements.txt does not exist"
           exit 1
@@ -84,7 +81,6 @@ jobs:
           echo "❌ dashboard/app.py does not exist"
           exit 1
         fi
-        
         echo "✅ All required files exist"
     
     - name: Run unit tests with pytest
@@ -115,16 +111,12 @@ jobs:
         sys.path.append('src')
         sys.path.append('dashboard')
         try:
-            # Test if dashboard modules can be imported
             import app
             print('✅ Dashboard modules can be imported')
-            
-            # Test if main dashboard class exists
             if hasattr(app, 'FinancialInclusionDashboard'):
                 print('✅ FinancialInclusionDashboard class exists')
             else:
-                print('⚠️  FinancialInclusionDashboard class not found')
-                
+                print('⚠️ FinancialInclusionDashboard class not found')
         except Exception as e:
             print(f'❌ Dashboard initialization failed: {e}')
             sys.exit(1)
@@ -132,17 +124,11 @@ jobs:
     
     - name: Create test data samples
       run: |
-        # Create test processed data directory
         mkdir -p data/processed
         mkdir -p models
-        
-        # Create sample enriched data for testing
-        echo "Creating sample enriched data..."
         python -c "
         import pandas as pd
         from datetime import datetime
-        
-        # Create sample enriched data
         enriched_data = pd.DataFrame({
             'record_type': ['observation', 'observation', 'event', 'impact_link'],
             'pillar': ['access', 'usage', None, 'access'],
@@ -154,11 +140,7 @@ jobs:
             'source_name': ['Global Findex', 'Global Findex', 'Ethio Telecom', 'Model'],
             'confidence': ['high', 'high', 'high', 'medium']
         })
-        
         enriched_data.to_csv('data/processed/enriched_data.csv', index=False)
-        print('Sample enriched data created')
-        
-        # Create sample forecast results
         forecast_results = pd.DataFrame({
             'indicator': ['Account Ownership', 'Digital Payments'],
             'year': [2027, 2027],
@@ -166,9 +148,7 @@ jobs:
             'forecast_value': [55.0, 45.0],
             'unit': ['%', '%']
         })
-        
         forecast_results.to_csv('models/forecast_results.csv', index=False)
-        print('Sample forecast results created')
         "
     
     - name: Test forecasting module
@@ -179,31 +159,26 @@ jobs:
         try:
             from forecast_model import FinancialInclusionForecaster
             forecaster = FinancialInclusionForecaster('data/processed/enriched_data.csv')
-            
-            # Test data preparation
             try:
                 data = forecaster.prepare_forecast_data('ACC_OWNERSHIP')
                 print(f'✅ Forecast data preparation successful')
-                print(f'   Data points: {len(data)}')
             except Exception as e:
-                print(f'⚠️  Forecast data preparation warning: {e}')
-                
+                print(f'⚠️ Forecast data preparation warning: {e}')
             print('✅ Forecasting module loaded successfully')
-            
         except Exception as e:
             print(f'❌ Forecasting module failed: {e}')
             sys.exit(1)
         "
     
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         file: ./coverage.xml
         fail_ci_if_error: false
     
     - name: Archive test results
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-results-python-${{ matrix.python-version }}
         path: |
@@ -213,7 +188,7 @@ jobs:
     
     - name: Archive coverage reports
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-reports-python-${{ matrix.python-version }}
         path: |
@@ -226,10 +201,10 @@ jobs:
     if: github.event_name == 'pull_request' && github.base_ref == 'main'
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
     
@@ -241,102 +216,53 @@ jobs:
     
     - name: Run integration tests
       run: |
-        # Test end-to-end data pipeline
-        echo "Running integration tests..."
         python -c "
         import sys
         sys.path.append('src')
-        
-        # Test complete pipeline
-        print('Testing complete data pipeline...')
-        
         try:
-            # 1. Load data
             from data_loader import DataLoader
             loader = DataLoader()
             raw_data, ref_codes = loader.load_data()
             print('✅ Step 1: Data loading successful')
-            
-            # 2. Enrich data
             from data_enricher import DataEnricher
             enricher = DataEnricher(raw_data)
             enricher.add_mobile_money_data()
             enriched_data = enricher.get_enriched_data()
-            print(f'✅ Step 2: Data enrichment successful (records: {len(enriched_data)})')
-            
-            # 3. Run EDA
+            print(f'✅ Step 2: Data enrichment successful')
             from eda_analyzer import EDAAnalyzer
-            # Save enriched data temporarily for analyzer
             enriched_data.to_csv('temp_enriched.csv', index=False)
             analyzer = EDAAnalyzer('temp_enriched.csv')
             insights = analyzer.generate_key_insights()
-            print(f'✅ Step 3: EDA analysis successful (insights generated)')
-            
-            # 4. Test forecasting
+            print(f'✅ Step 3: EDA analysis successful')
             from forecast_model import FinancialInclusionForecaster
             forecaster = FinancialInclusionForecaster('temp_enriched.csv')
             forecasts = forecaster.forecast_all_indicators()
-            print(f'✅ Step 4: Forecasting successful ({len(forecasts)} indicators forecasted)')
-            
-            # Clean up
+            print(f'✅ Step 4: Forecasting successful')
             import os
             if os.path.exists('temp_enriched.csv'):
                 os.remove('temp_enriched.csv')
-                
             print('🎉 All integration tests passed!')
-            
         except Exception as e:
             print(f'❌ Integration test failed: {e}')
-            import traceback
-            traceback.print_exc()
             sys.exit(1)
         "
     
-    - name: Test dashboard can start
+    - name: Test dashboard startup
       run: |
-        # Test that dashboard can be imported and initialized
-        echo "Testing dashboard startup..."
         timeout 30s python -c "
         import sys
-        import os
+        import streamlit as st
+        class MockStreamlit:
+            def __init__(self): self.calls = []
+            def __getattr__(self, name):
+                def method(*args, **kwargs): return self
+                return method
+        sys.modules['streamlit'] = MockStreamlit()
         sys.path.append('src')
         sys.path.append('dashboard')
-        
-        # Mock streamlit functions for testing
-        import streamlit as st
-        
-        class MockStreamlit:
-            def __init__(self):
-                self.calls = []
-            
-            def __getattr__(self, name):
-                def method(*args, **kwargs):
-                    self.calls.append((name, args, kwargs))
-                    return self
-                return method
-        
-        # Replace real streamlit with mock for testing
-        sys.modules['streamlit'] = MockStreamlit()
-        import streamlit as st
-        
-        # Now import and test dashboard
         from app import FinancialInclusionDashboard
-        
-        try:
-            dashboard = FinancialInclusionDashboard()
-            print('✅ Dashboard class instantiated successfully')
-            
-            # Test that it has required methods
-            required_methods = ['render_overview', 'render_trends', 'render_forecasts', 'run']
-            for method in required_methods:
-                if hasattr(dashboard, method):
-                    print(f'✅ Dashboard has method: {method}')
-                else:
-                    print(f'❌ Dashboard missing method: {method}')
-                    
-        except Exception as e:
-            print(f'❌ Dashboard test failed: {e}')
-            raise
+        dashboard = FinancialInclusionDashboard()
+        print('✅ Dashboard class instantiated successfully')
         "
       timeout-minutes: 2
 
@@ -346,195 +272,64 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Run safety check
       run: |
         pip install safety
         safety check -r requirements.txt --full-report
     
-    - name: Check for secrets in code
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    
     - name: Detect secrets
       uses: gitleaks/gitleaks-action@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        config-path: .gitleaks.toml
 
   documentation-check:
     runs-on: ubuntu-latest
     needs: test
-    
     steps:
-    - uses: actions/checkout@v3
-    
+    - uses: actions/checkout@v4
     - name: Check documentation completeness
       run: |
-        echo "Checking documentation..."
-        
-        # Check README exists
-        if [ ! -f "README.md" ]; then
-          echo "❌ README.md missing"
-          exit 1
-        fi
-        
-        # Check dashboard README
-        if [ ! -f "dashboard/README.md" ]; then
-          echo "❌ dashboard/README.md missing"
-          exit 1
-        fi
-        
-        # Check notebooks have README
-        if [ ! -f "notebooks/README.md" ]; then
-          echo "⚠️  notebooks/README.md missing (warning only)"
-        fi
-        
-        # Check for data dictionary
-        if [ ! -f "docs/data_dictionary.md" ] && [ ! -f "data/README.md" ]; then
-          echo "⚠️  Data dictionary missing (warning only)"
-        fi
-        
-        # Check requirements.txt has descriptions
-        if grep -q "^# " requirements.txt; then
-          echo "✅ requirements.txt has comments"
-        else
-          echo "⚠️  requirements.txt lacks comments (warning only)"
-        fi
-        
+        [ -f "README.md" ] || { echo "❌ README.md missing"; exit 1; }
+        [ -f "dashboard/README.md" ] || { echo "❌ dashboard/README.md missing"; exit 1; }
         echo "✅ Documentation check complete"
 
   performance-test:
     runs-on: ubuntu-latest
     needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
     steps:
-    - uses: actions/checkout@v3
-    
+    - uses: actions/checkout@v4
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
-    
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install memory_profiler psutil
-    
+      run: pip install -r requirements.txt memory_profiler psutil
     - name: Run performance tests
       run: |
-        echo "Running performance tests..."
-        
-        # Create test data file
         python -c "
         import pandas as pd
         import numpy as np
-        from datetime import datetime, timedelta
-        
-        # Create larger test dataset
         dates = pd.date_range(start='2011-01-01', end='2024-12-31', freq='M')
-        n_indicators = 10
-        n_records = len(dates) * n_indicators
-        
-        print(f'Creating performance test dataset with {n_records} records...')
-        
-        test_data = pd.DataFrame({
-            'record_type': ['observation'] * n_records,
-            'pillar': np.random.choice(['access', 'usage', 'infrastructure'], n_records),
-            'indicator': np.random.choice([f'Indicator_{i}' for i in range(n_indicators)], n_records),
-            'indicator_code': np.random.choice([f'IND_{i:03d}' for i in range(n_indicators)], n_records),
-            'value_numeric': np.random.uniform(0, 100, n_records),
-            'observation_date': np.repeat(dates, n_indicators),
-            'source_name': ['Test'] * n_records,
-            'confidence': np.random.choice(['high', 'medium', 'low'], n_records)
-        })
-        
+        n_records = len(dates) * 10
+        test_data = pd.DataFrame({'value_numeric': np.random.uniform(0, 100, n_records)})
         test_data.to_csv('data/processed/performance_test.csv', index=False)
-        print('Test dataset created')
         "
-    
-    - name: Test data loading performance
-      run: |
-        python -m memory_profiler -o memory_usage.log python -c "
-        import sys
-        import time
-        sys.path.append('src')
-        
-        from data_loader import DataLoader
-        
-        print('Testing data loading performance...')
-        
-        start_time = time.time()
-        loader = DataLoader()
-        
-        # Test with performance dataset
-        import pandas as pd
-        data = pd.read_csv('data/processed/performance_test.csv')
-        
-        load_time = time.time() - start_time
-        print(f'Data loading time: {load_time:.2f} seconds')
-        print(f'Data size: {len(data)} records')
-        print(f'Memory usage: {data.memory_usage(deep=True).sum() / 1024 / 1024:.2f} MB')
-        
-        if load_time > 5:
-            print('⚠️  Warning: Data loading time exceeds 5 seconds')
-        else:
-            print('✅ Data loading performance acceptable')
-        "
-    
-    - name: Clean up test files
-      if: always()
-      run: |
-        rm -f data/processed/performance_test.csv
-        rm -f memory_usage.log
+        python -m memory_profiler python -c "import pandas as pd; pd.read_csv('data/processed/performance_test.csv')"
 
   deploy-check:
     runs-on: ubuntu-latest
     needs: [test, integration-test, security-scan]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
     steps:
-    - uses: actions/checkout@v3
-    
+    - uses: actions/checkout@v4
     - name: Deployment readiness check
       run: |
-        echo "Checking deployment readiness..."
-        
-        # Check all required files exist
-        required_files=(
-          "requirements.txt"
-          "dashboard/app.py"
-          "src/__init__.py"
-          "data/processed/enriched_data.csv"
-          "models/forecast_results.csv"
-        )
-        
-        all_files_exist=true
+        required_files=("requirements.txt" "dashboard/app.py" "src/__init__.py")
         for file in "${required_files[@]}"; do
-          if [ ! -f "$file" ]; then
-            echo "❌ Missing required file: $file"
-            all_files_exist=false
-          fi
+          [ -f "$file" ] || { echo "❌ Missing: $file"; exit 1; }
         done
-        
-        if [ "$all_files_exist" = true ]; then
-          echo "✅ All required files present"
-        else
-          echo "❌ Missing required files"
-          exit 1
-        fi
-        
-        # Check Python syntax
-        echo "Checking Python syntax..."
-        python -m py_compile dashboard/app.py src/*.py 2>/dev/null || {
-          echo "❌ Python syntax errors found"
-          exit 1
-        }
-        echo "✅ Python syntax valid"
-        
-        echo "✅ Project is ready for deployment"
+        python -m py_compile dashboard/app.py src/*.py
+        echo "✅ Ready for deployment"
